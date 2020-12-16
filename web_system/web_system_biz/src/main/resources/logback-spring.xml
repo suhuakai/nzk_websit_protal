@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="logback-spring.xml"
+               scan="true" scanPeriod="60 seconds" debug="false">
+
+    <property name="consolePattern" value="%d{HH:mm:ss.SSS} %highlight(%-5p) %green(%-4L)[ygb_base] [%cyan(%-40.40logger{40})] : %m%n"/>
+    <property name="filePattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [his] %t{16} [%-40.40logger{40}] : %m%n"/>
+    <property name="log_dir" value="./logs/his"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${consolePattern}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="DEFAULT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/default.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/default/default.%d{yyyy-MM-dd HH}.%i.log.zip</fileNamePattern>
+            <maxHistory>168</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${filePattern}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_dir}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/error/error.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>
+            <maxHistory>15</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} ${filePattern}</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.web" level="DEBUG"/>
+    <logger name="com.baomidou.mybatisplus" level="DEBUG"/>
+    <logger name="com.baomidou.mybatisplus.core.MybatisConfiguration" level="INFO"/>
+    <logger name="org.mybatis" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.alibaba.druid.filter.stat.StatFilter" level="off"/>
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="INFO"/>
+    <logger name="org.mybatis.spring.SqlSessionUtils" level="INFO"/>
+    <logger name="com.baomidou.mybatisplus.extension.plugins.pagination.optimize.JsqlParserCountOptimize" level="INFO"/>
+    <logger name="springfox.documentation" level="ERROR"/>
+
+    <logger name="com.web.system.biz" level="INFO"/>
+    <logger name="com.web.system.api" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="DEFAULT"/>
+        <appender-ref ref="ERROR"/>
+    </root>
+
+</configuration>

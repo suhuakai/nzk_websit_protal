@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.system.biz.userInfo.dao.ChinaregisterDao">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.web.system.api.entity.Chinaregister">
+        <result column="id" property="id" />
+        <result column="rno" property="rno" />
+        <result column="rname" property="rname" />
+        <result column="raddress" property="raddress" />
+        <result column="paddress" property="paddress" />
+        <result column="aname" property="aname" />
+        <result column="aaddress" property="aaddress" />
+        <result column="mname" property="mname" />
+        <result column="fmsp" property="fmsp" />
+        <result column="structure" property="structure" />
+        <result column="srange" property="srange" />
+        <result column="others" property="others" />
+        <result column="remark" property="remark" />
+        <result column="pdate" property="pdate" />
+        <result column="udate" property="udate" />
+        <result column="attach" property="attach" />
+        <result column="mstandard" property="mstandard" />
+        <result column="mdate" property="mdate" />
+        <result column="postno" property="postno" />
+        <result column="maincomps" property="maincomps" />
+        <result column="puse" property="puse" />
+        <result column="storagecon" property="storagecon" />
+        <result column="pdept" property="pdept" />
+        <result column="mcontents" property="mcontents" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, rno, rname, raddress, paddress, aname, aaddress, mname, fmsp, structure, srange, others, remark, pdate, udate, attach, mstandard, mdate, postno, maincomps, puse, storagecon, pdept, mcontents
+    </sql>
+
+    <select id="getList" resultType="com.web.system.api.entity.Chinaregister" parameterType="com.web.core.entity.Pager">
+        select <include refid="Base_Column_List"/>from chinaregister
+    </select>
+
+</mapper>
