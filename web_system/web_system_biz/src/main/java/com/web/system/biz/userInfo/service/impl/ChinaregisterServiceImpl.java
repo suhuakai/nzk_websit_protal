@@ -1,12 +1,14 @@
 package com.web.system.biz.userInfo.service.impl;
-import com.web.core.entity.Pager;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.web.core.service.impl.BaseServiceImpl;
+import com.web.core.util.PageUtils;
+import com.web.core.util.Query;
 import com.web.system.biz.userInfo.dao.ChinaregisterDao;
 import com.web.system.api.entity.Chinaregister;
 import com.web.system.biz.userInfo.service.ChinaregisterService;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -20,7 +22,12 @@ import java.util.List;
 public class ChinaregisterServiceImpl extends BaseServiceImpl<ChinaregisterDao, Chinaregister> implements ChinaregisterService {
 
     @Override
-    public List<Chinaregister> getList(Pager pager) {
-        return baseMapper.getList(pager);
+    public PageUtils queryPage(Map<String, Object> params) {
+        IPage<Chinaregister> page =baseMapper.selectPage(
+                new Query<Chinaregister>().getPage(params),
+                new QueryWrapper<Chinaregister>()
+        );
+
+        return new PageUtils(page);
     }
 }

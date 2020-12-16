@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="logback-spring.xml"
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="logback.xsd"
                scan="true" scanPeriod="60 seconds" debug="false">
 
     <property name="consolePattern" value="%d{HH:mm:ss.SSS} %highlight(%-5p) %green(%-4L)[ygb_base] [%cyan(%-40.40logger{40})] : %m%n"/>

@@ -1,22 +1,20 @@
 package com.web.system.biz.userInfo.web;
 
 
-import com.web.core.entity.Pager;
-import com.web.system.api.entity.Chinaregister;
+import com.web.core.entity.R;
+import com.web.core.util.PageUtils;
 import com.web.system.biz.userInfo.service.ChinaregisterService;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.WebUtils;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author sunhua
@@ -25,19 +23,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/chinaregister")
 public class ChinaregisterController {
+
     @Autowired
     private ChinaregisterService chinaregisterService;
 
-
-    @RequestMapping("/getList")
-    public Pager getList(String rno,  Integer pageSize, Integer pageNum) {
-        Pager pager = new Pager(true);
-        pager.setPageNum(pageNum == null ? 1 : pageNum);
-        pager.setPageSize(pageSize == null ? 10 : pageSize);
-        pager.addQueryParam("rno", rno);
-        List<Chinaregister> chinaregisterList = chinaregisterService.getList(pager);
-        pager.setRows(chinaregisterList);
-        return pager;
+    /**
+     * 列表
+     */
+    @RequestMapping("/list")
+    public R list(@RequestParam Map<String, Object> params) {
+        PageUtils page = chinaregisterService.queryPage(params);
+        return R.ok().put("page", page);
     }
 
 

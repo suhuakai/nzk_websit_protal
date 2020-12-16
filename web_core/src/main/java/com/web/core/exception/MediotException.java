@@ -21,7 +21,6 @@ public class MediotException extends RuntimeException implements Codable {
      * 附带信息
      */
     private Object attachment;
-
     public MediotException(Integer code, Object... args) {
         super(LocalStringUtils.getMessageByCode(code, args));
         this.code = (code == null ? DEFAULT_ERROR_CODE : code);

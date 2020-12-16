@@ -676,7 +676,7 @@ public final class LocalStringUtils {
         return string;
     }
 
-    /**
+   /* *//**
      * 字符串占位符替换（占位符：{}）
      * @param code
      * @param args
@@ -689,7 +689,6 @@ public final class LocalStringUtils {
         }
         return fomart(msg, args);
     }
-
     /**
      * 字符串截取
      * @param str
@@ -708,35 +707,6 @@ public final class LocalStringUtils {
     public static void main(String[] args) throws Exception {
 
         System.out.println(substringTrim("123", 2));
-
-        //System.out.println(caseWhen("abc"));
-        //System.out.println(caseWhen("abc", "a", "A", "b", "B", "默认值"));
-        //System.out.println(caseWhen("abc", "a", "A", "b", "B", "abc", "ABC"));
-        //System.out.println(caseWhen("70", "90", "采购订单", "30", "手术订单", "70", "结算订单"));
-        //System.out.println(contains(new String[]{"  ", " aB"}, "ab ", true, true));
-        //System.out.println(nvl(null, "1", "2", "3", "4", "5", "6"));
-
-        //System.out.println(fomart("{}，必须是{}位{}{}！1{}2", "发票代码", "8", "纯", "数字", null));
-
-		/*System.out.println(LocalStringUtils.caseWhen(
-				null,
-				"全部", null,
-				"-1", null,
-				"01", "启用",
-				"00", "停用",
-				"默认"
-		));*/
-        /*System.out.println(concatString(new String[]{
-                "70",
-                "90",
-                "采购订单",
-                "30",
-                "手术订单",
-                "70",
-                "结算订单"
-        }, "[", null, null, ", ", "]", true));*/
-        //System.out.println(isBlankAll(null, "", "  "));//true
-        //System.out.println(isBlankAll(null, "", " 字符 "));//false
     }
 
 }

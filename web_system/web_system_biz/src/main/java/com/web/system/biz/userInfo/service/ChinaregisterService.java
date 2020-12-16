@@ -1,10 +1,9 @@
 package com.web.system.biz.userInfo.service;
 
-import com.web.core.entity.Pager;
 import com.web.core.service.BaseService;
+import com.web.core.util.PageUtils;
 import com.web.system.api.entity.Chinaregister;
-
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -16,5 +15,5 @@ import java.util.List;
  */
 public interface ChinaregisterService extends BaseService<Chinaregister> {
 
-    List<Chinaregister> getList(Pager pager);
+    PageUtils queryPage(Map<String, Object> params);
 }
