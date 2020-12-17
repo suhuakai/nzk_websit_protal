@@ -18,9 +18,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: "jdbc:mysql://localhost:3306/his?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&allowMultiQueries=true&useSSL=false&autoReconnect=true&failOverReadOnly=false"
+      url: "jdbc:mysql://localhost:3306/web_base?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&allowMultiQueries=true&useSSL=false&autoReconnect=true&failOverReadOnly=false"
       username: root
-      password: 123456
+      password: root
       initial-size: 5
       max-active: 200
       max-wait: 10000
@@ -34,6 +34,27 @@ spring:
       test-while-idle: true
       filters: mergeStat
 
+  mail:
+    host: smtp.qq.com
+    port: 587
+    password: femvvmfwdufobajd
+    username: 792773202@qq.com
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  sms:
+    regoinId: cn-hangzhou
+    product: Dysmsapi
+    accessKeyId: LTAI4G8WuSbQgWVmGW8GNwDS
+    secret: vF1GqiMBx9Ssh4c2gJ9nPTEJMZkCWt
+    domain: dysmsapi.aliyuncs.com
+    signName: 实验数字管理系统
+    templateCode: SMS_205398858
+
   main:
     allow-bean-definition-overriding: true
   redis:
@@ -42,7 +63,7 @@ spring:
     database: 1
     password: 98761234
   session:
-    store-type: redis
+    store-type: none
     timeout: 86400
   mvc:
     throw-exception-if-no-handler-found: true

@@ -18,7 +18,14 @@
         <dependency>
             <groupId>com.web.system.api</groupId>
             <artifactId>web_system_api</artifactId>
-            <version>2.1.0</version>
+            <version>1.20.0803</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.common</groupId>
+            <artifactId>web_common</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

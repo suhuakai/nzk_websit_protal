@@ -90,11 +90,34 @@
         <springfox.swagger.version>2.9.2</springfox.swagger.version>
         <swagger.bootstrap-ui.version>1.9.4</swagger.bootstrap-ui.version>
         <lombok.version>1.18.8</lombok.version>
-        <oracle.ojdbc6.version>11.2.0</oracle.ojdbc6.version>
+       <!-- <oracle.ojdbc6.version>11.2.0</oracle.ojdbc6.version>-->
         <skipTests>true</skipTests>
+        <thymeleaf.version>2.1.6.RELEASE</thymeleaf.version>
+        <thymeleaf-layout-dialect.version>2.2.0</thymeleaf-layout-dialect.version>
+        <mail.version>1.5.0-b01</mail.version>
     </properties>
 
     <dependencies>
+
+        <!--邮件依赖-->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>${mail.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.aliyun/aliyun-java-sdk-dysmsapi -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -595,43 +618,6 @@
             <artifactId>qiniu-java-sdk</artifactId>
             <version>[7.2.0, 7.2.99]</version>
         </dependency>
-        <!--wxx-->
-        <!-- lucene核心库 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>4.10.2</version>
-        </dependency>
-        <!-- Lucene的查询解析器 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>4.10.2</version>
-        </dependency>
-        <!-- lucene的默认分词器库 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.10.2</version>
-        </dependency>
-        <!-- lucene的高亮显示 -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-highlighter</artifactId>
-            <version>4.10.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>4.10.2</version>
-        </dependency>
-        <!-- 引入IK分词器 -->
-        <dependency>
-            <groupId>com.janeluo</groupId>
-            <artifactId>ikanalyzer</artifactId>
-            <version>2012_u6</version>
-        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -640,11 +626,11 @@
         </dependency>
 
         <!-- oracle驱动 -->
-        <dependency>
+       <!-- <dependency>
             <groupId>oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>${oracle.ojdbc6.version}</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>xerces</groupId>
@@ -656,6 +642,19 @@
             <groupId>com.alibaba.otter</groupId>
             <artifactId>canal.client</artifactId>
             <version>1.1.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils -->
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.3</version>
         </dependency>
 
     </dependencies>
