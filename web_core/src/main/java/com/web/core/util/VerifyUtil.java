@@ -11,6 +11,8 @@ package com.web.core.util;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class VerifyUtil {
     // 验证码字符集
@@ -83,6 +85,37 @@ public class VerifyUtil {
         Color color = new Color(ran.nextInt(256),
                 ran.nextInt(256), ran.nextInt(256));
         return color;
+    }
+
+
+    /**
+     * 校验手机号
+     * @param mobile
+     * @return
+     */
+    public static boolean checkMobile(String mobile){
+        String regex="^1[3,5,6,7,8,9]\\d{9}$";
+        Pattern compile = Pattern.compile(regex);
+        Matcher matcher = compile.matcher(mobile);
+        if(matcher.find()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 校验邮箱格式
+     * @param email
+     * @return
+     */
+    public static boolean checkEmail(String email){
+        String regex="\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+        Pattern compile = Pattern.compile(regex);
+        Matcher matcher = compile.matcher(email);
+        if(matcher.find()){
+            return true;
+        }
+        return false;
     }
 
 }
