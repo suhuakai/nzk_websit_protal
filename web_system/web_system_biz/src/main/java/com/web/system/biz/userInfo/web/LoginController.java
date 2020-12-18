@@ -298,9 +298,9 @@ class LoginController {
         String token = session.getId();
         if (!session.isNew()) {
             response.setHeader(WebConfig.HTTP_SESSION_ID, token);
-            log.debug("➧➧➧ 复用会话：JSESSIONID={}", session.getId());
+            log.debug("➧➧➧ 复用会话：token={}", session.getId());
         }
-        log.debug("当前用户会话：JSESSIONID={}", session.getId());
+        log.debug("当前用户会话：token={}", session.getId());
         LocalAssert.equalsIf(true, Constant.UserInfoFstate.Enable.getCode(),userInfo.getFstate(),"该账户已经停用，请联系管理员");
 
         UserInfoVo userInfoVo   = new UserInfoVo();
