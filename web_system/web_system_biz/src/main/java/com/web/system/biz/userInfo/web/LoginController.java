@@ -7,6 +7,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.web.common.util.Constant;
 import com.web.common.util.RandomUtil;
 import com.web.core.config.WebConfig;
 import com.web.core.entity.R;
@@ -15,8 +16,12 @@ import com.web.core.redis.RedisConfigService;
 import com.web.core.util.DateUtils;
 import com.web.core.util.LocalAssert;
 import com.web.core.util.VerifyUtil;
+import com.web.system.api.entity.UserInfo;
 import com.web.system.api.vo.SmsVo;
-import lombok.extern.slf4j.Slf4j;
+import com.web.system.api.vo.UserInfoVo;
+import com.web.system.biz.userInfo.service.UserInfoService;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 /**
@@ -42,13 +48,12 @@ import java.util.Date;
  * @version 1.0
  * @since JDK 1.8
  */
-@Slf4j
+@Log4j2
 @RestController
 @RequestMapping("/login")
 class LoginController {
     @Autowired
     private SmsVo smsVo;
-
 
     @Value("${spring.mail.username}")
     private String from;
@@ -58,6 +63,9 @@ class LoginController {
 
     @Autowired
     RedisConfigService redisConfigService;
+
+    @Autowired
+    UserInfoService userInfoService;
 
 
     /**
@@ -268,49 +276,39 @@ class LoginController {
      * @return UserInfoVo
      */
     @RequestMapping(path = "ajaxLogin", produces = "application/json;charset=utf-8")
-    public R ajaxLogin(String loginNo, String password, String code, String verifty, HttpServletRequest request, HttpServletResponse response) {
+    public R ajaxLogin(String loginNo, String password, String code, String verifty, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
         HttpSession session = request.getSession();
         LocalAssert.notNull(loginNo, "登录账号不能为空");
         LocalAssert.notBlank(verifty, "验证码不能为空");
         LocalAssert.equals(verifty, session.getAttribute("imageCode"), "验证码错误，请重新校验");
         String veriftyCode;
+        //检查账号
+        UserInfo userInfo;
         if (VerifyUtil.checkMobile(loginNo) || VerifyUtil.checkEmail(loginNo)) { //手机号 邮箱
             LocalAssert.notNull(code,"手机或邮箱验证码不允许为空");
             veriftyCode = (String) redisConfigService.get(loginNo);
             LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
             LocalAssert.equals(veriftyCode,code,"请重新确认验证码");
+            userInfo = userInfoService.getByLoginNo(loginNo);
         }  else { //账号
             LocalAssert.notNull(password,"密码不能为空");
+            userInfo = userInfoService.findUserInfo(loginNo,password);
         }
-
+        LocalAssert.notNull(userInfo,"该用户信息不存在");
+        String token = session.getId();
         if (!session.isNew()) {
-            response.setHeader(WebConfig.HTTP_SESSION_ID, session.getId());
+            response.setHeader(WebConfig.HTTP_SESSION_ID, token);
             log.debug("➧➧➧ 复用会话：JSESSIONID={}", session.getId());
         }
         log.debug("当前用户会话：JSESSIONID={}", session.getId());
+        LocalAssert.equalsIf(true, Constant.UserInfoFstate.Enable.getCode(),userInfo.getFstate(),"该账户已经停用，请联系管理员");
 
-        //检查账号和密码是否合法
-       /* UserEntity baseUserInfo = userService.findUserInfoByParameter(id, password);
-        if (null == baseUserInfo) {
-            throw new RRException("助记词或密码错误");
-        }
-        if (null != baseUserInfo && "no".equals(baseUserInfo.getStatus())) {
-            log.error(baseUserInfo.getStatus() + ":账号已经停用");
-            throw new RRException("账号已经停用");
-        }
-        if (null != baseUserInfo && "no".equals(baseUserInfo.getIsActivate())) {
-            log.error(baseUserInfo.getStatus() + ":账号未激活，请联系管理员");
-            throw new RRException("账号未激活，请联系管理员");
-        }*/
-        String token = session.getId();
-       /* UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(baseUserInfo, userVo);
-
-        userVo.setToken(token);
-        userVo.setPassword(Md5.MD5(userVo.getPassword()));*/
-        redisConfigService.set(token, loginNo, Long.valueOf(9000));
-       // session.setAttribute(token, baseUserInfo);
-        return R.ok(token);
+        UserInfoVo userInfoVo   = new UserInfoVo();
+        BeanUtils.copyProperties(userInfo, userInfoVo); //TODO 具体返回值待定
+        userInfoVo.setToken(token);
+        redisConfigService.set(token, loginNo, 9000L);
+        session.setAttribute(token, userInfoVo);
+        return R.ok(userInfoVo);
     }
 
 
