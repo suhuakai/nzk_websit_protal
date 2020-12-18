@@ -50,6 +50,12 @@ public class UserInfo implements Serializable {
     private String name;
 
     /**
+     * 账户
+     */
+    @TableField("login_no")
+    private String loginNo;
+
+    /**
      * 密码
      */
     @TableField("password")
