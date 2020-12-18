@@ -7,16 +7,16 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.web.common.util.RandomUtil;
 import com.web.core.config.WebConfig;
+import com.web.core.entity.R;
+import com.web.core.exception.ValidationException;
+import com.web.core.redis.RedisConfigService;
+import com.web.core.util.DateUtils;
+import com.web.core.util.LocalAssert;
 import com.web.core.util.VerifyUtil;
 import com.web.system.api.vo.SmsVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.Random;
 
 /**
  * 登录
@@ -56,6 +55,9 @@ class LoginController {
 
     @Resource
     JavaMailSender javaMailSender;
+
+    @Autowired
+    RedisConfigService redisConfigService;
 
 
     /**
@@ -105,10 +107,10 @@ class LoginController {
      * 发送邮箱验证码
      *
      * @param email
-     * @param session
      */
-    @RequestMapping(value = "/getMailCode/{email}", method = RequestMethod.GET)
-    public void sendMail(@PathVariable String email, HttpSession session) {
+    //@RequestMapping(value = "/getMailCode/{email}", method = RequestMethod.GET)
+    public void sendMail(//@PathVariable
+                          String email) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
@@ -128,9 +130,13 @@ class LoginController {
             String company = "湖北新纵科病毒疾病工程技术有限公司";
             //生成随机数
             String random = RandomUtil.generateDigitalNumString(6);
+            String date = DateUtils.DateToStr(new Date(), "yyyy-MM-dd");
             //将随机数放置到session中
-            session.setAttribute("email", email);
-            session.setAttribute("code", random);
+            /*session.setAttribute("email", email);
+            session.setAttribute("code", random);*/
+            if (!redisConfigService.exists(email)) { //10分钟过期
+                redisConfigService.set(email, random, (long) 1800 * 10);
+            }
             mimeMessageHelper.setSentDate(new Date());
             String emailCodeText = "<!DOCTYPE html>\n" +
                     "<html>\n" +
@@ -197,7 +203,7 @@ class LoginController {
                     "<P><SPAN style=\"FONT-SIZE: 18px; FONT-WEIGHT: bold; COLOR: #f90\">" + random + "</SPAN><SPAN style=\"COLOR: #000000\">(为了保障您帐号的安全性，请在10分钟内完成验证)</SPAN></P>\n" +
                     "<DIV class=footer style=\"MARGIN-TOP: 30px\">\n" +
                     "<P>" + company + "</P>\n" +
-                    "<P><SPAN style=\"BORDER-BOTTOM: #ccc 1px dashed; POSITION: relative; _display: inline-block\" t=\"5\" times=\"\" isout=\"0\">2019-02-12</SPAN></P></DIV>\n" +
+                    "<P><SPAN style=\"BORDER-BOTTOM: #ccc 1px dashed; POSITION: relative; _display: inline-block\" t=\"5\" times=\"\" isout=\"0\">" + date + "</SPAN></P></DIV>\n" +
                     "<DIV class=tip style=\"COLOR: #cccccc; TEXT-ALIGN: center\">该邮件为系统自动发送，请勿进行回复 </DIV></DIV></DIV></DIV></DIV></DIV></DIV></DIV></BODY>\n" +
                     "</html>\n";
             //设置验证码的样式
@@ -214,10 +220,11 @@ class LoginController {
 
     /**
      * 发送手机验证码
+     *
      * @param mobile
      */
-    @RequestMapping(value = "/getMobileCode/{mobile}", method = RequestMethod.GET)
-    public boolean sendMobile(@PathVariable String mobile) throws ClientException {
+    //@RequestMapping(value = "/getMobileCode/{mobile}", method = RequestMethod.GET)
+    public boolean sendMobile(String mobile) throws ClientException {
         String code = RandomUtil.generateDigitalNumString(6);
         String messageJSON = "{\"code\":\"" + code + "\"}";
         //可自助调整超时时间
@@ -225,7 +232,7 @@ class LoginController {
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");*/
         //初始化acsClient,暂不支持region化
         IClientProfile profile = DefaultProfile.getProfile(smsVo.regoinId, smsVo.accessKeyId, smsVo.secret);
-       // DefaultProfile.addEndpoint(smsConfig.regoinId, smsConfig.regoinId, smsConfig.product, smsConfig.domain);
+        // DefaultProfile.addEndpoint(smsConfig.regoinId, smsConfig.regoinId, smsConfig.product, smsConfig.domain);
         IAcsClient acsClient = new DefaultAcsClient(profile);
         //组装请求对象-具体描述见控制台-文档部分内容
         SendSmsRequest request = new SendSmsRequest();
@@ -244,10 +251,88 @@ class LoginController {
         //request.setOutId("yourOutId");
         //hint 此处可能会抛出异常，注意catch
         SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-        if(sendSmsResponse.getCode()!= null && sendSmsResponse.getCode().equals("OK")){
+        if (!redisConfigService.exists(mobile)) {
+            redisConfigService.set(mobile, code, 1800 * 10 * 1L);
+        }
+
+        if (sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
             return true;
         }
         return false;
     }
+
+    /**
+     * 登录接口
+     * @author sunhua
+     * @Date 2020/12/18
+     * @return UserInfoVo
+     */
+    @RequestMapping(path = "ajaxLogin", produces = "application/json;charset=utf-8")
+    public R ajaxLogin(String loginNo, String password, String code, String verifty, HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession();
+        LocalAssert.notNull(loginNo, "登录账号不能为空");
+        LocalAssert.notBlank(verifty, "验证码不能为空");
+        LocalAssert.equals(verifty, session.getAttribute("imageCode"), "验证码错误，请重新校验");
+        String veriftyCode;
+        if (VerifyUtil.checkMobile(loginNo) || VerifyUtil.checkEmail(loginNo)) { //手机号 邮箱
+            LocalAssert.notNull(code,"手机或邮箱验证码不允许为空");
+            veriftyCode = (String) redisConfigService.get(loginNo);
+            LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
+            LocalAssert.equals(veriftyCode,code,"请重新确认验证码");
+        }  else { //账号
+            LocalAssert.notNull(password,"密码不能为空");
+        }
+
+        if (!session.isNew()) {
+            response.setHeader(WebConfig.HTTP_SESSION_ID, session.getId());
+            log.debug("➧➧➧ 复用会话：JSESSIONID={}", session.getId());
+        }
+        log.debug("当前用户会话：JSESSIONID={}", session.getId());
+
+        //检查账号和密码是否合法
+       /* UserEntity baseUserInfo = userService.findUserInfoByParameter(id, password);
+        if (null == baseUserInfo) {
+            throw new RRException("助记词或密码错误");
+        }
+        if (null != baseUserInfo && "no".equals(baseUserInfo.getStatus())) {
+            log.error(baseUserInfo.getStatus() + ":账号已经停用");
+            throw new RRException("账号已经停用");
+        }
+        if (null != baseUserInfo && "no".equals(baseUserInfo.getIsActivate())) {
+            log.error(baseUserInfo.getStatus() + ":账号未激活，请联系管理员");
+            throw new RRException("账号未激活，请联系管理员");
+        }*/
+        String token = session.getId();
+       /* UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(baseUserInfo, userVo);
+
+        userVo.setToken(token);
+        userVo.setPassword(Md5.MD5(userVo.getPassword()));*/
+        redisConfigService.set(token, loginNo, Long.valueOf(9000));
+       // session.setAttribute(token, baseUserInfo);
+        return R.ok(token);
+    }
+
+
+    /**
+     * 获取验证码
+     * @param loginNo
+     */
+    @RequestMapping(value = "/getByLogin")
+    public void getByLogin(String loginNo) throws ClientException {
+        LocalAssert.notNull(loginNo,"手机或邮箱不能为空");
+        if(!VerifyUtil.checkEmail(loginNo)){
+            throw  new ValidationException("邮箱格式不正确");
+        }else if(VerifyUtil.checkMobile(loginNo)){
+            throw  new ValidationException("手机号格式不正确");
+        }else{
+            if(VerifyUtil.checkEmail(loginNo)){
+                this.sendMail(loginNo);
+            }else if(VerifyUtil.checkMobile(loginNo)){
+                this.sendMobile(loginNo);
+            }
+        }
+    }
+
 
 }
