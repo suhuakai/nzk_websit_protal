@@ -15,6 +15,7 @@ import com.web.core.exception.ValidationException;
 import com.web.core.redis.RedisConfigService;
 import com.web.core.util.DateUtils;
 import com.web.core.util.LocalAssert;
+import com.web.core.util.MD5Util;
 import com.web.core.util.VerifyUtil;
 import com.web.system.api.entity.UserInfo;
 import com.web.system.api.vo.SmsVo;
@@ -118,7 +119,7 @@ class LoginController {
      */
     //@RequestMapping(value = "/getMailCode/{email}", method = RequestMethod.GET)
     public void sendMail(//@PathVariable
-                          String email) {
+                         String email) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
@@ -271,9 +272,10 @@ class LoginController {
 
     /**
      * 登录接口
+     *
+     * @return UserInfoVo
      * @author sunhua
      * @Date 2020/12/18
-     * @return UserInfoVo
      */
     @RequestMapping(path = "ajaxLogin", produces = "application/json;charset=utf-8")
     public R ajaxLogin(String loginNo, String password, String code, String verifty, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
@@ -285,25 +287,25 @@ class LoginController {
         //检查账号
         UserInfo userInfo;
         if (VerifyUtil.checkMobile(loginNo) || VerifyUtil.checkEmail(loginNo)) { //手机号 邮箱
-            LocalAssert.notNull(code,"手机或邮箱验证码不允许为空");
+            LocalAssert.notNull(code, "手机或邮箱验证码不允许为空");
             veriftyCode = (String) redisConfigService.get(loginNo);
             LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
-            LocalAssert.equals(veriftyCode,code,"请重新确认验证码");
+            LocalAssert.equals(veriftyCode, code, "请重新确认验证码");
             userInfo = userInfoService.getByLoginNo(loginNo);
-        }  else { //账号
-            LocalAssert.notNull(password,"密码不能为空");
-            userInfo = userInfoService.findUserInfo(loginNo,password);
+        } else { //账号
+            LocalAssert.notNull(password, "密码不能为空");
+            userInfo = userInfoService.findUserInfo(loginNo, password);
         }
-        LocalAssert.notNull(userInfo,"该用户信息不存在");
+        LocalAssert.notNull(userInfo, "该用户信息不存在");
         String token = session.getId();
         if (!session.isNew()) {
             response.setHeader(WebConfig.HTTP_SESSION_ID, token);
             log.debug("➧➧➧ 复用会话：token={}", session.getId());
         }
         log.debug("当前用户会话：token={}", session.getId());
-        LocalAssert.equalsIf(true, Constant.UserInfoFstate.Enable.getCode(),userInfo.getFstate(),"该账户已经停用，请联系管理员");
+        LocalAssert.equalsIf(true, Constant.UserInfoFstate.Enable.getCode(), userInfo.getFstate(), "该账户已经停用，请联系管理员");
 
-        UserInfoVo userInfoVo   = new UserInfoVo();
+        UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(userInfo, userInfoVo); //TODO 具体返回值待定
         userInfoVo.setToken(token);
         redisConfigService.set(token, loginNo, 9000L);
@@ -314,22 +316,40 @@ class LoginController {
 
     /**
      * 获取验证码
+     *
      * @param loginNo
      */
     @RequestMapping(value = "/getByLogin")
-    public void getByLogin(String loginNo) throws ClientException {
-        LocalAssert.notNull(loginNo,"手机或邮箱不能为空");
-        if(!VerifyUtil.checkEmail(loginNo)){
-            throw  new ValidationException("邮箱格式不正确");
-        }else if(VerifyUtil.checkMobile(loginNo)){
-            throw  new ValidationException("手机号格式不正确");
-        }else{
-            if(VerifyUtil.checkEmail(loginNo)){
+    public R getByLogin(String loginNo) throws ClientException {
+        LocalAssert.notNull(loginNo, "手机或邮箱不能为空");
+        if (!VerifyUtil.checkEmail(loginNo)) {
+            throw new ValidationException("邮箱格式不正确");
+        } else if (VerifyUtil.checkMobile(loginNo)) {
+            throw new ValidationException("手机号格式不正确");
+        } else {
+            if (VerifyUtil.checkEmail(loginNo)) {
                 this.sendMail(loginNo);
-            }else if(VerifyUtil.checkMobile(loginNo)){
+            } else if (VerifyUtil.checkMobile(loginNo)) {
                 this.sendMobile(loginNo);
             }
         }
+        return R.ok();
+    }
+
+    /**
+     * 密码重置
+     */
+    @RequestMapping(value = "/resetPwd")
+    public R resetPwd(String loginNo, String veriftyCode) {
+        LocalAssert.notNull(loginNo, "用户账号不能为空");
+        String code = (String) redisConfigService.get(loginNo);
+        LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
+        LocalAssert.equals(veriftyCode, code, "请重新确认验证码");
+        UserInfo userInfo = userInfoService.getByLoginNo(loginNo);
+        LocalAssert.notNull(userInfo, "该用户不存在，请确认账号是否正确");
+        userInfo.setPassword(MD5Util.MD5Encrypt(Constant.DEFAULT_PWD));
+        userInfoService.updateById(userInfo);
+        return R.ok();
     }
 
 

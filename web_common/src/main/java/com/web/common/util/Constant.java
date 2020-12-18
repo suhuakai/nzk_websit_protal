@@ -32,5 +32,10 @@ public class Constant {
 
     }
 
+    /**
+     * 用户默认密码
+     */
+    public static  final String DEFAULT_PWD = "123456";
+
 
 }
