@@ -94,13 +94,15 @@ public class VerifyUtil {
      * @return
      */
     public static boolean checkMobile(String mobile){
-        String regex="^1[3,5,6,7,8,9]\\d{9}$";
+        String regex="^((13[0-9])|(15[^4])|(18[0-9])|(17[0-9])|(147))\\d{8}$";
         Pattern compile = Pattern.compile(regex);
         Matcher matcher = compile.matcher(mobile);
         if(matcher.find()){
             return true;
+        }else{
+            return false;
         }
-        return false;
+
     }
 
     /**
@@ -112,7 +114,7 @@ public class VerifyUtil {
         String regex="\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
         Pattern compile = Pattern.compile(regex);
         Matcher matcher = compile.matcher(email);
-        if(matcher.find()){
+        if(matcher.matches()){
             return true;
         }
         return false;

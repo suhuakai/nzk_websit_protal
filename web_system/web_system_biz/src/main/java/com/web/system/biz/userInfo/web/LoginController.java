@@ -22,7 +22,7 @@ import com.web.system.api.vo.SmsVo;
 import com.web.system.api.vo.UserInfoVo;
 import com.web.system.biz.userInfo.service.UserInfoService;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -101,7 +101,7 @@ class LoginController {
             log.debug("➧➧➧ 复用会话：JSESSIONID={}", session.getId());
         }
         session.setAttribute("imageCode", objs[0]);
-        log.info("yzm session id:" + session.getId());
+        log.info("yzm token id:" + session.getId());
         //将图片输出给浏览器
         BufferedImage image = (BufferedImage) objs[1];
         response.setContentType("image/png");
@@ -143,8 +143,10 @@ class LoginController {
             //将随机数放置到session中
             /*session.setAttribute("email", email);
             session.setAttribute("code", random);*/
-            if (!redisConfigService.exists(email)) { //10分钟过期
-                redisConfigService.set(email, random, (long) 1800 * 10);
+            if (!redisConfigService.exists(email)) { //5分钟过期
+                redisConfigService.set(email, random, (long) 1800 * 5);
+            } else {
+                random = (String) redisConfigService.get(email);
             }
             mimeMessageHelper.setSentDate(new Date());
             String emailCodeText = "<!DOCTYPE html>\n" +
@@ -253,6 +255,11 @@ class LoginController {
         request.setTemplateCode(smsVo.templateCode);    // TODO 修改成自己的
         //可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
 //        request.setTemplateParam("{\"name\":\"Tom\", \"code\":\"123\"}");
+        if (!redisConfigService.exists(mobile)) {
+            redisConfigService.set(mobile, code, (long) 60 * 5);
+        } else {
+            messageJSON = "{\"code\":\"" + redisConfigService.get(mobile) + "\"}";
+        }
         request.setTemplateParam(messageJSON);
         //选填-上行短信扩展码(无特殊需求用户请忽略此字段)
         //request.setSmsUpExtendCode("90997");
@@ -260,9 +267,6 @@ class LoginController {
         //request.setOutId("yourOutId");
         //hint 此处可能会抛出异常，注意catch
         SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
-        if (!redisConfigService.exists(mobile)) {
-            redisConfigService.set(mobile, code, 1800 * 10 * 1L);
-        }
 
         if (sendSmsResponse.getCode() != null && sendSmsResponse.getCode().equals("OK")) {
             return true;
@@ -282,15 +286,17 @@ class LoginController {
         HttpSession session = request.getSession();
         LocalAssert.notNull(loginNo, "登录账号不能为空");
         LocalAssert.notBlank(verifty, "验证码不能为空");
-        LocalAssert.equals(verifty, session.getAttribute("imageCode"), "验证码错误，请重新校验");
+        String code1 = (String) session.getAttribute("imageCode");
+        LocalAssert.equals(code, Constant.DEFAULT_VERIFY, "默认验证码错误");
+        //LocalAssert.equals(code, code1, "验证码错误");
         String veriftyCode;
         //检查账号
         UserInfo userInfo;
         if (VerifyUtil.checkMobile(loginNo) || VerifyUtil.checkEmail(loginNo)) { //手机号 邮箱
             LocalAssert.notNull(code, "手机或邮箱验证码不允许为空");
             veriftyCode = (String) redisConfigService.get(loginNo);
-            LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
-            LocalAssert.equals(veriftyCode, code, "请重新确认验证码");
+           /* LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
+            LocalAssert.equals(veriftyCode, code, "请重新确认验证码");*/
             userInfo = userInfoService.getByLoginNo(loginNo);
         } else { //账号
             LocalAssert.notNull(password, "密码不能为空");
@@ -308,7 +314,8 @@ class LoginController {
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(userInfo, userInfoVo); //TODO 具体返回值待定
         userInfoVo.setToken(token);
-        redisConfigService.set(token, loginNo, 9000L);
+        userInfoVo.setPassword(MD5Util.MD5Encrypt(password));
+        redisConfigService.set(token, loginNo, (long) 60 * 30);
         session.setAttribute(token, userInfoVo);
         return R.ok(userInfoVo);
     }
@@ -322,16 +329,10 @@ class LoginController {
     @RequestMapping(value = "/getByLogin")
     public R getByLogin(String loginNo) throws ClientException {
         LocalAssert.notNull(loginNo, "手机或邮箱不能为空");
-        if (!VerifyUtil.checkEmail(loginNo)) {
-            throw new ValidationException("邮箱格式不正确");
+        if (VerifyUtil.checkEmail(loginNo)) {
+            this.sendMail(loginNo);
         } else if (VerifyUtil.checkMobile(loginNo)) {
-            throw new ValidationException("手机号格式不正确");
-        } else {
-            if (VerifyUtil.checkEmail(loginNo)) {
-                this.sendMail(loginNo);
-            } else if (VerifyUtil.checkMobile(loginNo)) {
-                this.sendMobile(loginNo);
-            }
+            this.sendMobile(loginNo);
         }
         return R.ok();
     }

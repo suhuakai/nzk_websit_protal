@@ -36,6 +36,12 @@ public class Constant {
      * 用户默认密码
      */
     public static  final String DEFAULT_PWD = "123456";
+    /**
+     * 用户默认校验码
+     */
+    public static  final String DEFAULT_VERIFY = "8888";
+
+
 
 
 }
