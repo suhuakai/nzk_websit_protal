@@ -105,7 +105,7 @@ public class DateUtils {
      */
     public static Date convertDate(String dateStr, String format)
             throws ParseException {
-        Date date = null;
+        java.util.Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         date = simpleDateFormat.parse(dateStr);
         return date;
@@ -124,9 +124,9 @@ public class DateUtils {
      * @return
      */
     public static Date minuteChange(Date date, Integer minute) {
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.MINUTE, minute);
+        calendar.add(java.util.Calendar.MINUTE, minute);
         return calendar.getTime();
     }
 
@@ -137,9 +137,9 @@ public class DateUtils {
      * @return
      */
     public static Date hourChange(Date date, Integer hour) {
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.HOUR_OF_DAY, hour);
+        calendar.add(java.util.Calendar.HOUR_OF_DAY, hour);
         return calendar.getTime();
     }
 
@@ -150,9 +150,9 @@ public class DateUtils {
      * @return
      */
     public static Date dayChange(Date date, Integer day) {
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_WEEK, day);
+        calendar.add(java.util.Calendar.DAY_OF_WEEK, day);
         return calendar.getTime();
     }
 
@@ -163,9 +163,9 @@ public class DateUtils {
      * @return
      */
     public static Date monthChange(Date date, Integer month) {
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.MONTH, month);
+        calendar.add(java.util.Calendar.MONTH, month);
         return calendar.getTime();
     }
 
@@ -176,9 +176,9 @@ public class DateUtils {
      * @return
      */
     public static Date yearChange(Date date, Integer year) {
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
-        calendar.add(Calendar.YEAR, year);
+        calendar.add(java.util.Calendar.YEAR, year);
         return calendar.getTime();
     }
 
@@ -192,7 +192,7 @@ public class DateUtils {
         if (null == date) {
             return null;
         }
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.YEAR);
     }
@@ -207,7 +207,7 @@ public class DateUtils {
         if (null == date) {
             return null;
         }
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.MONTH) + 1;
     }
@@ -222,7 +222,7 @@ public class DateUtils {
         if (null == date) {
             return null;
         }
-        Calendar calendar = Calendar.getInstance();
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.DATE);
     }
@@ -370,7 +370,7 @@ public class DateUtils {
             }
             aaa = y + m + d;
         }
-        Date date = null;
+        java.util.Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         try {
             date = simpleDateFormat.parse(aaa);
@@ -417,7 +417,7 @@ public class DateUtils {
             }
             aaa = y + m + d + " " + h + ":" + f + ":" + miao + ":" + hm;
         }
-        Date date = null;
+        java.util.Date date = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyMMdd hh:mm:ss:SS");
         try {
             date = simpleDateFormat.parse(aaa);
@@ -639,8 +639,8 @@ public class DateUtils {
     }
 
     public static void main(String[] args) {
-        String date1 = "2020-10-09 00:00:00";
-        String date2 = "2020-12-15 23:59:59";
+        String date1 = "2020-01-09 00:00:00";
+        String date2 = "2020-05-13 23:59:59";
         System.out.println(isEffectiveDate(date1, date2));
     }
 }

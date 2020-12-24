@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.core.dao.OracleMapper">
+
+	<!--批量插入操作-->
+	<insert id="insertList">
+		<foreach collection="insertMetas" item="meta" open="begin " close="end;">
+			insert into ${meta.tableName}
+				<foreach collection="meta.valueMappings" item="field" open="(" close=")" separator=", ">
+					<if test="excludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(excludeFieldNames, field.column, true)">${field.column}</if>
+				</foreach>
+			values
+				<foreach collection="meta.valueMappings" item="field" open="(" close=")" separator=", ">
+					<if test="excludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(excludeFieldNames, field.column, true)">
+						<include refid="com.web.core.dao.BasicMapper.COLUMN_VALUE"/>
+					</if>
+				</foreach> ;
+		</foreach>
+	</insert>
+
+	<!-- 根据主键合并更新 -->
+	<update id="merge">
+		MERGE INTO ${meta.tableName} t
+		USING (
+			select
+				<foreach collection="meta.valueMappings" item="field" separator=", ">
+					<include refid="com.web.core.dao.BasicMapper.COLUMN_VALUE"/> as ${field.column}
+				</foreach>
+			from dual
+		) tt ON ( <foreach collection="meta.idColumnNames" item="column" separator=" and ">t.${column}=tt.${column}</foreach> )
+		WHEN MATCHED THEN
+		UPDATE SET
+		<foreach collection="meta.updateColumnNames" item="column" separator=", ">
+			<if test="updateExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(updateExcludeFieldNames, column, true)">
+				t.${column} = tt.${column}
+			</if>
+		</foreach>
+		WHEN NOT MATCHED THEN
+		INSERT
+		<foreach collection="meta.valueMappings" item="field" open="(" close=")" separator=", ">
+			<if test="insertExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(insertExcludeFieldNames, field.column, true)">
+				${field.column}
+			</if>
+		</foreach>
+		VALUES
+		<foreach collection="meta.valueMappings" item="field" open="(" close=")" separator=", ">
+			<if test="insertExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(insertExcludeFieldNames, field.column, true)">
+				tt.${field.column}
+			</if>
+		</foreach>
+	</update>
+
+	<!-- 根据主键批量合并更新 -->
+	<update id="mergeList">
+		<foreach collection="mergeMetas" item="meta" open=" begin " close=" end; ">
+			MERGE INTO ${meta.tableName} t
+			USING (
+				select
+					<foreach collection="meta.valueMappings" item="field" separator=", ">
+						<include refid="com.web.core.dao.BasicMapper.COLUMN_VALUE"/> as ${field.column}
+					</foreach>
+				from dual
+			) tt ON ( <foreach collection="meta.idColumnNames" item="column" separator=" and ">t.${column}=tt.${column}</foreach> )
+			WHEN MATCHED THEN
+			UPDATE SET
+				<foreach collection="meta.updateColumnNames" item="column" separator=", ">
+					<if test="updateExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(updateExcludeFieldNames, column, true)">
+						t.${column} = tt.${column}
+					</if>
+				</foreach>
+			WHEN NOT MATCHED THEN
+			INSERT
+				<foreach collection="meta.valueMappings" item="field" open="(" close=")" separator=", ">
+					<if test="insertExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(insertExcludeFieldNames, field.column, true)">
+						${field.column}
+					</if>
+				</foreach>
+			VALUES
+				<foreach collection="meta.valueMappings" item="field" open="(" close=");" separator=", ">
+					<if test="insertExcludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(insertExcludeFieldNames, field.column, true)">
+						tt.${field.column}
+					</if>
+				</foreach>
+		</foreach>
+	</update>
+
+</mapper>

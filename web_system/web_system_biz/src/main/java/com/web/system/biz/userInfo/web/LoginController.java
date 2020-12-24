@@ -7,16 +7,14 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.web.common.util.Constant;
-import com.web.common.util.RandomUtil;
-import com.web.core.config.WebConfig;
-import com.web.core.entity.R;
-import com.web.core.exception.ValidationException;
+import com.web.common.config.WebConfig;
+import com.web.common.constant.CustomConst;
+import com.web.common.utils.RandomUtil;
+import com.web.common.utils.VerifyUtil;
 import com.web.core.redis.RedisConfigService;
 import com.web.core.util.DateUtils;
 import com.web.core.util.LocalAssert;
 import com.web.core.util.MD5Util;
-import com.web.core.util.VerifyUtil;
 import com.web.system.api.entity.UserInfo;
 import com.web.system.api.vo.SmsVo;
 import com.web.system.api.vo.UserInfoVo;
@@ -98,7 +96,7 @@ class LoginController {
         HttpSession session = request.getSession();
         if (!session.isNew()) {
             response.setHeader(WebConfig.HTTP_SESSION_ID, session.getId());
-            log.debug("➧➧➧ 复用会话：JSESSIONID={}", session.getId());
+            log.debug("➧➧➧ 复用会话：token={}", session.getId());
         }
         session.setAttribute("imageCode", objs[0]);
         log.info("yzm token id:" + session.getId());
@@ -117,9 +115,7 @@ class LoginController {
      *
      * @param email
      */
-    //@RequestMapping(value = "/getMailCode/{email}", method = RequestMethod.GET)
-    public void sendMail(//@PathVariable
-                         String email) {
+    public void sendMail( String email) {
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
@@ -280,20 +276,21 @@ class LoginController {
      * @return UserInfoVo
      * @author sunhua
      * @Date 2020/12/18
+     *
      */
     @RequestMapping(path = "ajaxLogin", produces = "application/json;charset=utf-8")
-    public R ajaxLogin(String loginNo, String password, String code, String verifty, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
+    public UserInfoVo ajaxLogin(String loginNo, String password, String imageCode, String verify, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
         HttpSession session = request.getSession();
         LocalAssert.notNull(loginNo, "登录账号不能为空");
-        LocalAssert.notBlank(verifty, "验证码不能为空");
+        LocalAssert.notBlank(imageCode, "验证码不能为空");
         String code1 = (String) session.getAttribute("imageCode");
-        LocalAssert.equals(code, Constant.DEFAULT_VERIFY, "默认验证码错误");
+        LocalAssert.equals(imageCode, CustomConst.DEFAULT_IMAGECODE, "默认验证码错误");
         //LocalAssert.equals(code, code1, "验证码错误");
         String veriftyCode;
         //检查账号
         UserInfo userInfo;
         if (VerifyUtil.checkMobile(loginNo) || VerifyUtil.checkEmail(loginNo)) { //手机号 邮箱
-            LocalAssert.notNull(code, "手机或邮箱验证码不允许为空");
+            LocalAssert.notNull(verify, "手机或邮箱验证码不允许为空");
             veriftyCode = (String) redisConfigService.get(loginNo);
            /* LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
             LocalAssert.equals(veriftyCode, code, "请重新确认验证码");*/
@@ -309,15 +306,16 @@ class LoginController {
             log.debug("➧➧➧ 复用会话：token={}", session.getId());
         }
         log.debug("当前用户会话：token={}", session.getId());
-        LocalAssert.equalsIf(true, Constant.UserInfoFstate.Enable.getCode(), userInfo.getFstate(), "该账户已经停用，请联系管理员");
+        LocalAssert.equalsIf(true, CustomConst.UserInfoFstate.Enable.getCode(), userInfo.getFstate(), "该账户已经停用，请联系管理员");
 
         UserInfoVo userInfoVo = new UserInfoVo();
         BeanUtils.copyProperties(userInfo, userInfoVo); //TODO 具体返回值待定
         userInfoVo.setToken(token);
         userInfoVo.setPassword(MD5Util.MD5Encrypt(password));
-        redisConfigService.set(token, loginNo, (long) 60 * 30);
-        session.setAttribute(token, userInfoVo);
-        return R.ok(userInfoVo);
+        //redisConfigService.set(token, loginNo, (long) 60 * 30);
+        //缓存当前用户信息及用户扩展信息
+        session.setAttribute(CustomConst.LoginUser.SESSION_USER_INFO, userInfoVo);
+        return userInfoVo;
     }
 
 
@@ -327,30 +325,28 @@ class LoginController {
      * @param loginNo
      */
     @RequestMapping(value = "/getByLogin")
-    public R getByLogin(String loginNo) throws ClientException {
+    public void getByLogin(String loginNo) throws ClientException {
         LocalAssert.notNull(loginNo, "手机或邮箱不能为空");
         if (VerifyUtil.checkEmail(loginNo)) {
             this.sendMail(loginNo);
         } else if (VerifyUtil.checkMobile(loginNo)) {
             this.sendMobile(loginNo);
         }
-        return R.ok();
     }
 
     /**
      * 密码重置
      */
     @RequestMapping(value = "/resetPwd")
-    public R resetPwd(String loginNo, String veriftyCode) {
+    public void resetPwd(String loginNo, String veriftyCode) {
         LocalAssert.notNull(loginNo, "用户账号不能为空");
         String code = (String) redisConfigService.get(loginNo);
         LocalAssert.notNull(veriftyCode, "验证码不存在或已失效");
         LocalAssert.equals(veriftyCode, code, "请重新确认验证码");
         UserInfo userInfo = userInfoService.getByLoginNo(loginNo);
         LocalAssert.notNull(userInfo, "该用户不存在，请确认账号是否正确");
-        userInfo.setPassword(MD5Util.MD5Encrypt(Constant.DEFAULT_PWD));
+        userInfo.setPassword(MD5Util.MD5Encrypt(CustomConst.DEFAULT_PASSWORD));
         userInfoService.updateById(userInfo);
-        return R.ok();
     }
 
 

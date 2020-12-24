@@ -2,8 +2,6 @@ package com.web.system.biz.userInfo.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.web.core.service.impl.BaseServiceImpl;
-import com.web.core.util.PageUtils;
-import com.web.core.util.Query;
 import com.web.system.biz.userInfo.dao.ChinaregisterDao;
 import com.web.system.api.entity.Chinaregister;
 import com.web.system.biz.userInfo.service.ChinaregisterService;
@@ -21,7 +19,7 @@ import java.util.Map;
 @Service
 public class ChinaregisterServiceImpl extends BaseServiceImpl<ChinaregisterDao, Chinaregister> implements ChinaregisterService {
 
-    @Override
+  /*  @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<Chinaregister> page =baseMapper.selectPage(
                 new Query<Chinaregister>().getPage(params),
@@ -29,5 +27,5 @@ public class ChinaregisterServiceImpl extends BaseServiceImpl<ChinaregisterDao, 
         );
 
         return new PageUtils(page);
-    }
+    }*/
 }

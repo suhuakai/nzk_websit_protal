@@ -83,7 +83,6 @@ public class ExceptionUtils {
                 error = "【网络问题】" + error;
             }
         } else if (exception instanceof NullPointerException) {
-            //TODO 提示语可以换个更友好的语句
             error = "空指针";
         } else {
             error = exception.getMessage();
@@ -106,8 +105,8 @@ public class ExceptionUtils {
         Throwable cause = getRootCause(e);
         StringBuffer exceptionName = new StringBuffer("[");
         if (cause instanceof WebException) {
-            WebException YgbException = (WebException) cause;
-            String nestedException = YgbException.getCauseException();
+            WebException webException = (WebException) cause;
+            String nestedException = webException.getCauseException();
             exceptionName.append(cause.getClass()
                                       .getSimpleName());
             if (StringUtils.isNotBlank(nestedException)) {

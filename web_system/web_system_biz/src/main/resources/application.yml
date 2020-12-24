@@ -20,7 +20,7 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: "jdbc:mysql://localhost:3306/web_base?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&allowMultiQueries=true&useSSL=false&autoReconnect=true&failOverReadOnly=false"
       username: root
-      password: root
+      password: 123456
       initial-size: 5
       max-active: 200
       max-wait: 10000
@@ -58,12 +58,12 @@ spring:
   main:
     allow-bean-definition-overriding: true
   redis:
-    host: 114.55.175.233
+    host: 127.0.0.1
     port: 6379
-    database: 1
-    password: 98761234
+    #database: 1
+    #password: 98761234
   session:
-    store-type: none
+    store-type: redis
     timeout: 86400
   mvc:
     throw-exception-if-no-handler-found: true

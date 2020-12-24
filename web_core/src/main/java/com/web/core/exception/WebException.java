@@ -1,7 +1,7 @@
 package com.web.core.exception;
 
 /**
- *   基本异常类
+ *   同步服务器基本异常类
  * @author
  * @version 1.0
  */

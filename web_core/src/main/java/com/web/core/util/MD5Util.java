@@ -43,7 +43,7 @@ public class MD5Util {
 	}
 	 // 测试主函数  
     public static void main(String args[]) {  
-        String s = new String("123456");
+        String s = new String("888888");
         System.out.println("原始：" + s);  
         System.out.println("加密的：" + MD5Encrypt(s).toUpperCase());  
         System.out.println("解密的：" + bytetoString(s.getBytes()));  

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.core.dao.BasicMapper">
+
+	<!-- 插入操作 -->
+	<insert id="insert">
+		insert into ${tableName}
+			<foreach collection="columnNames" item="columnName" open="(" close=")" separator=", ">
+				<if test="excludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(excludeFieldNames, columnName, true)">
+					${columnName}
+				</if>
+			</foreach>
+		values
+			<foreach collection="valueMappings" item="field" open="(" close=")" separator=", ">
+				<if test="excludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(excludeFieldNames, field.column, true)">
+					<include refid="COLUMN_VALUE"/>
+				</if>
+			</foreach>
+	</insert>
+
+	<!-- 更新操作 -->
+	<update id="update">
+		update ${tableName}
+		<set>
+			<foreach collection="valueMappings" item="field" separator=", ">
+				<if test="excludeFieldNames==null or !@com.mediot.core.util.LocalStringUtils@contains(excludeFieldNames, field.column, true)">
+					${field.column} = <include refid="COLUMN_VALUE"/>
+				</if>
+			</foreach>
+		</set>
+		<where>
+			<if test="conditions!=null and !conditions.empty">
+				<foreach collection="conditions" item="field" separator="and">
+					${field.column} = <include refid="COLUMN_VALUE"/>
+				</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 删除操作 -->
+	<delete id="delete">
+		delete from ${tableName}
+		<where>
+			<if test="conditions!=null and !conditions.empty">
+				<foreach collection="conditions" item="field" separator="and">
+					${field.column} = <include refid="COLUMN_VALUE"/>
+				</foreach>
+			</if>
+		</where>
+	</delete>
+
+	<!-- 查询操作 -->
+	<select id="query" resultType="map" flushCache="true" useCache="false">
+		select
+			<foreach collection="columnNames" item="columnName" separator=", ">${columnName}</foreach>
+		from ${tableName}
+		<if test="conditions!=null and !conditions.empty">
+			<where>
+				<foreach collection="conditions" item="field" separator="and">
+					${field.column} = <include refid="COLUMN_VALUE"/>
+				</foreach>
+			</where>
+		</if>
+	</select>
+
+	<!-- 列值：例如 #{field.value, jdbcType=VARCHAR} -->
+	<sql id="COLUMN_VALUE">
+		<choose>
+			<when test='field.jdbcTypeName=="VARCHAR"'>#{field.value, jdbcType=VARCHAR}</when>
+			<when test='field.jdbcTypeName=="DECIMAL"'>#{field.value, jdbcType=DECIMAL}</when>
+			<when test='field.jdbcTypeName=="NUMERIC"'>#{field.value, jdbcType=NUMERIC}</when>
+			<when test='field.jdbcTypeName=="TIMESTAMP"'>#{field.value, jdbcType=TIMESTAMP}</when>
+			<when test='field.jdbcTypeName=="DATE"'>#{field.value, jdbcType=DATE}</when>
+			<when test='field.jdbcTypeName=="TIME"'>#{field.value, jdbcType=TIME}</when>
+			<when test='field.jdbcTypeName=="NVARCHAR"'>#{field.value, jdbcType=NVARCHAR}</when>
+			<when test='field.jdbcTypeName=="CHAR"'>#{field.value, jdbcType=CHAR}</when>
+			<when test='field.jdbcTypeName=="DOUBLE"'>#{field.value, jdbcType=DOUBLE}</when>
+			<when test='field.jdbcTypeName=="FLOAT"'>#{field.value, jdbcType=FLOAT}</when>
+			<when test='field.jdbcTypeName=="BIGINT"'>#{field.value, jdbcType=BIGINT}</when>
+			<when test='field.jdbcTypeName=="INTEGER"'>#{field.value, jdbcType=INTEGER}</when>
+			<when test='field.jdbcTypeName=="SMALLINT"'>#{field.value, jdbcType=SMALLINT}</when>
+			<when test='field.jdbcTypeName=="TINYINT"'>#{field.value, jdbcType=TINYINT}</when>
+			<when test='field.jdbcTypeName=="BIT"'>#{field.value, jdbcType=BIT}</when>
+			<when test='field.jdbcTypeName=="BOOLEAN"'>#{field.value, jdbcType=BOOLEAN}</when>
+			<when test='field.jdbcTypeName=="BLOB"'>#{field.value, jdbcType=BLOB}</when>
+			<when test='field.jdbcTypeName=="CLOB"'>#{field.value, jdbcType=CLOB}</when>
+			<when test='field.jdbcTypeName=="NCHAR"'>#{field.value, jdbcType=NCHAR}</when>
+			<when test='field.jdbcTypeName=="NCLOB"'>#{field.value, jdbcType=NCLOB}</when>
+			<when test='field.jdbcTypeName=="BINARY"'>#{field.value, jdbcType=BINARY}</when>
+			<when test='field.jdbcTypeName=="CURSOR"'>#{field.value, jdbcType=CURSOR}</when>
+			<when test='field.jdbcTypeName=="LONGVARBINARY"'>#{field.value, jdbcType=LONGVARBINARY}</when>
+			<when test='field.jdbcTypeName=="LONGVARCHAR"'>#{field.value, jdbcType=LONGVARCHAR}</when>
+			<when test='field.jdbcTypeName=="VARBINARY"'>#{field.value, jdbcType=VARBINARY}</when>
+			<when test='field.jdbcTypeName=="ARRAY"'>#{field.value, jdbcType=ARRAY}</when>
+			<when test='field.jdbcTypeName=="NULL"'>#{field.value, jdbcType=NULL}</when>
+			<when test='field.jdbcTypeName=="OTHER"'>#{field.value, jdbcType=OTHER}</when>
+			<when test='field.jdbcTypeName=="REAL"'>#{field.value, jdbcType=REAL}</when>
+			<when test='field.jdbcTypeName=="STRUCT"'>#{field.value, jdbcType=STRUCT}</when>
+			<when test='field.jdbcTypeName=="UNDEFINED"'>#{field.value, jdbcType=UNDEFINED}</when>
+			<when test="field.value==null or field.value==''">null</when>
+			<otherwise>#{field.value, jdbcType=VARCHAR}</otherwise>
+		</choose>
+	</sql>
+
+</mapper>
