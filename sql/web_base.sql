@@ -86,3 +86,11 @@ CREATE TABLE `ts_org_info` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`org_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='机构信息表';
+
+CREATE TABLE `ts_menu_platform` (
+  `menu_code` varchar(32) DEFAULT NULL COMMENT '菜单id',
+  `platform_id` varchar(32) DEFAULT NULL COMMENT '平台id',
+  `create_date` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+  `create_user_name` varchar(50) DEFAULT NULL COMMENT '创建人'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
