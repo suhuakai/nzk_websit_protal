@@ -1,7 +1,7 @@
 package com.web.system.biz.userInfo.service;
 
-import com.web.system.biz.userInfo.entity.Platform;
 import com.web.core.service.BaseService;
+import com.web.system.api.entity.Platform;
 
 /**
  * <p>

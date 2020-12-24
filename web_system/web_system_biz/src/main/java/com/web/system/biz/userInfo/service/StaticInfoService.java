@@ -1,7 +1,6 @@
 package com.web.system.biz.userInfo.service;
 
 import com.web.system.api.entity.StaticInfo;
-import com.web.system.biz.userInfo.entity.StaticInfo;
 import com.web.core.service.BaseService;
 
 import java.util.List;

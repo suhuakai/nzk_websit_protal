@@ -1,6 +1,6 @@
 package com.web.system.biz.userInfo.service.impl;
 
-import com.web.system.biz.userInfo.entity.Platform;
+import com.web.system.api.entity.Platform;
 import com.web.system.biz.userInfo.dao.PlatformMapper;
 import com.web.system.biz.userInfo.service.PlatformService;
 import com.web.core.service.impl.BaseServiceImpl;

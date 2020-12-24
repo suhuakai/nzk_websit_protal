@@ -1,6 +1,6 @@
 package com.web.system.biz.userInfo.service.impl;
 
-import com.web.system.biz.userInfo.entity.DeptInfo;
+import com.web.system.api.entity.DeptInfo;
 import com.web.system.biz.userInfo.dao.DeptInfoMapper;
 import com.web.system.biz.userInfo.service.DeptInfoService;
 import com.web.core.service.impl.BaseServiceImpl;

@@ -1,6 +1,7 @@
 package com.web.system.biz.userInfo.service;
 
-import com.web.system.biz.userInfo.entity.OrgInfo;
+import com.web.system.api.entity.OrgInfo;
+
 import com.web.core.service.BaseService;
 
 /**

@@ -1,7 +1,6 @@
 package com.web.system.biz.userInfo.dao;
-
-import com.web.system.biz.userInfo.entity.DeptInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.web.system.api.entity.DeptInfo;
 
 /**
  * <p>

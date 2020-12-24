@@ -1,6 +1,6 @@
 package com.web.system.biz.userInfo.service.impl;
 
-import com.web.system.biz.userInfo.entity.MenuPlatform;
+import com.web.system.api.entity.MenuPlatform;
 import com.web.system.biz.userInfo.dao.MenuPlatformMapper;
 import com.web.system.biz.userInfo.service.MenuPlatformService;
 import com.web.core.service.impl.BaseServiceImpl;
