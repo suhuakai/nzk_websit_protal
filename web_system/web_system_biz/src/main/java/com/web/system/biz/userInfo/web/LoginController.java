@@ -9,6 +9,7 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.web.common.config.WebConfig;
 import com.web.common.constant.CustomConst;
+import com.web.common.security.permission.annotation.Opened;
 import com.web.common.utils.RandomUtil;
 import com.web.common.utils.VerifyUtil;
 import com.web.core.redis.RedisConfigService;
@@ -50,6 +51,7 @@ import java.util.Date;
 @Log4j2
 @RestController
 @RequestMapping("/login")
+@Opened
 class LoginController {
     @Autowired
     private SmsVo smsVo;
@@ -279,7 +281,7 @@ class LoginController {
      *
      */
     @RequestMapping(path = "ajaxLogin", produces = "application/json;charset=utf-8")
-    public UserInfoVo ajaxLogin(String loginNo, String password, String imageCode, String verify, HttpServletRequest request, HttpServletResponse response) throws InvocationTargetException, IllegalAccessException {
+    public UserInfoVo ajaxLogin(String loginNo, String password, String imageCode, String verify, HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         LocalAssert.notNull(loginNo, "登录账号不能为空");
         LocalAssert.notBlank(imageCode, "验证码不能为空");
