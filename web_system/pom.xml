@@ -17,7 +17,6 @@
         <module>web_system_biz</module>
     </modules>
     <dependencies>
-
         <dependency>
             <groupId>com.web.core</groupId>
             <artifactId>web_core</artifactId>

@@ -64,8 +64,8 @@ public class UserInfo implements Serializable {
     /**
      * 机构id
      */
-    @TableField("organization_id")
-    private String organizationId;
+    @TableField("org_id")
+    private String orgId;
 
     /**
      * 部门id
