@@ -12,13 +12,13 @@ import com.web.common.constant.CustomConst;
 import com.web.common.security.permission.annotation.Opened;
 import com.web.common.utils.RandomUtil;
 import com.web.common.utils.VerifyUtil;
+import com.web.core.entity.UserInfoVo;
 import com.web.core.redis.RedisConfigService;
 import com.web.core.util.DateUtils;
 import com.web.core.util.LocalAssert;
 import com.web.core.util.MD5Util;
 import com.web.system.api.entity.UserInfo;
 import com.web.system.api.vo.SmsVo;
-import com.web.system.api.vo.UserInfoVo;
 import com.web.system.biz.userInfo.service.UserInfoService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
@@ -315,7 +315,7 @@ class LoginController {
         userInfoVo.setToken(token);
         userInfoVo.setPassword(MD5Util.MD5Encrypt(password));
         //redisConfigService.set(token, loginNo, (long) 60 * 30);
-        //缓存当前用户信息及用户扩展信息
+        //缓存当前用户信息及用户扩展信息(由于sessiona，redis保存对象是以对象路径保存的，所以将拓展对象改为公共对象)
         session.setAttribute(CustomConst.LoginUser.SESSION_USER_INFO, userInfoVo);
         return userInfoVo;
     }

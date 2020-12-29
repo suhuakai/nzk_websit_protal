@@ -16,4 +16,6 @@ import java.util.List;
 public interface StaticInfoService extends BaseService<StaticInfo> {
 
     List<StaticInfo> dictListByCode(String staticType, String code);
+
+    List<StaticInfo> dictListByStaticType(String staticType);
 }

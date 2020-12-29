@@ -39,4 +39,15 @@ public class StaticInfoController {
         return  staticInfoList;
     }
 
+    /**
+     *
+     * @param staticType
+     * @return
+     */
+    @RequestMapping("/dictListByStaticType")
+    public List<StaticInfo> dictListByStaticType(String staticType) {
+        List<StaticInfo> staticInfoList = staticInfoService.dictListByStaticType(staticType);
+        return  staticInfoList;
+    }
+
 }

@@ -24,4 +24,10 @@ public class StaticInfoServiceImpl extends BaseServiceImpl<StaticInfoMapper, Sta
         List<StaticInfo> staticInfoList = baseMapper.selectList(new QueryWrapper<StaticInfo>().eq("static_type",staticType).eq("code",code));
         return staticInfoList;
     }
+
+    @Override
+    public List<StaticInfo> dictListByStaticType(String staticType) {
+        List<StaticInfo> staticInfoList = baseMapper.selectList(new QueryWrapper<StaticInfo>().eq("static_type",staticType));
+        return staticInfoList;
+    }
 }
