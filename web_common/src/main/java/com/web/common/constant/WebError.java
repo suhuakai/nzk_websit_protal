@@ -39,14 +39,6 @@ public enum WebError implements Codable {
     LOGIN_REQUIRE_TOKEN(10008, "缺少请求头“token”！"),
     LOGIN_SESSION_UNKNOWN(10006, "用户未正常登录！必须明确当前用户身份！"),
 
-    LOGIN_REQUIRE_STORAGE_ID(20001, "登录检查：必须明确“库房”！"),
-    LOGIN_REQUIRE_STORAGE_NAME(20002, "登录检查：必须明确“库房名称”！"),
-    LOGIN_REQUIRE_STORAGE_TYPE(20003, "登录检查：必须明确“库房级别”！"),
-    LOGIN_REQUIRE_DEPT_ID(20004, "登录检查：必须明确“科室”！"),
-    LOGIN_REQUIRE_DEPT_NAME(20005, "登录检查：必须明确“科室名称”！"),
-    LOGIN_REQUIRE_LARGE_STORAGE(20006, "登录检查：只有“大库房”才能做该操作！"),
-    LOGIN_REQUIRE_DEPT_STORAGE(20007, "登录检查：只有“科室库”才能做该操作！"),
-
 
 
     /**  openapi错误码  */
