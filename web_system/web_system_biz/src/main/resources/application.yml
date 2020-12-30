@@ -35,10 +35,10 @@ spring:
       filters: mergeStat
 
   mail:
-    host: smtp.qq.com
-    port: 587
-    password: femvvmfwdufobajd
-    username: 792773202@qq.com
+    host:
+    port:
+    password:
+    username:
     properties:
       mail:
         smtp:
@@ -47,13 +47,13 @@ spring:
             enable: true
             required: true
   sms:
-    regoinId: cn-hangzhou
-    product: Dysmsapi
-    accessKeyId: LTAI4G8WuSbQgWVmGW8GNwDS
-    secret: vF1GqiMBx9Ssh4c2gJ9nPTEJMZkCWt
-    domain: dysmsapi.aliyuncs.com
-    signName: 实验数字管理系统
-    templateCode: SMS_205398858
+    regoinId:
+    product:
+    accessKeyId:
+    secret:
+    domain:
+    signName:
+    templateCode:
 
   main:
     allow-bean-definition-overriding: true
